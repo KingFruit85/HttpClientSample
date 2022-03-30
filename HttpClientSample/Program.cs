@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace HttpClientSample
 {
@@ -36,53 +37,33 @@ namespace HttpClientSample
         public List<string> status_codes { get; set; }
     }
 
-    public class Root
+    public class UptimeResponse
     {
         public Data data { get; set; }
     }
-
-    // 
-    // !!! An App.Config file needs to be created with the following values defined
-    //
-    //<? xml version="1.0" encoding="utf-8" ?>
-    //<configuration>
-    //  <appSettings>
-    //    <add key = "URL" value="" />
-    //    <add key = "URL_PARAMS" value="" />
-    //    <add key = "AUTH_HEADER_VALUE" value=""/>
-    //  </appSettings>
-    //</configuration>
 
 
     class Program
     {
         static void Main(string[] args)
         {
-            string URL = ConfigurationManager.AppSettings.Get("URL"); // The domain 
-
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(URL);
-
-            //Add and accept header for JSON format
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-            string authValue = ConfigurationManager.AppSettings.Get("AUTH_HEADER_VALUE"); // the auth value, such as bearer 1234gh45678fgfh8dfghg9x10
-            client.DefaultRequestHeaders.Add("Authorization", authValue);
-
-            // List data response
-            string urlParameters = ConfigurationManager.AppSettings.Get("URL_PARAMS"); // The Endpoint : like v1/uptime/1234567
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result; // Blocking call!
-            if (response.IsSuccessStatusCode)
+            List<string> siteIds = new List<string> { "6333766", "6333769", "6333772", "6333774", "6333790", "6333791", "6333792", "6333793", "6333794", "6284257" };
+            // Loop through all the site codes and get a response for them all
+            var sb = new StringBuilder();
+            foreach (var id in siteIds)
             {
-                // Parse the response body
-                var r = response.Content.ReadAsAsync<Root>().Result;
-                    Console.WriteLine($"{r.data.website_url} has an uptime score of {r.data.uptime}");
+                var result = StatusCakeAPICaller.GetWebsiteUptime(id);
+
+                if (result.data.status != "up")
+                {
+                    // Send warning somewhere?
+                }
+
+                Console.WriteLine($"{result.data.website_url} name is {result.data.status}. Last checked at: {result.data.last_tested_at}. The site has an uptime rating of {result.data.uptime}");
+
+
             }
-            else
-            {
-                Console.WriteLine($"{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
-            }
-            client.Dispose();
+            
         }
     }
 }
