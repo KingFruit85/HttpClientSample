@@ -48,7 +48,7 @@ namespace StatusCakeAPIDemo
         static void Main(string[] args)
         {
             // These are all my Status Cake uptime monitoring test ids
-            List<string> siteIds = new List<string> { "6333766", "6333769", "6333772", "6333774", "6333790", "6333791", "6333792", "6333793", "6333794", "6284257" };
+            List<string> siteIds = new List<string> { "6336695", "6333769", "6333772", "6333774", "6333790", "6333791", "6333792", "6333793", "6333794", "6284257" };
 
             // Check the the most recent result of all the tests
             foreach (var id in siteIds)
